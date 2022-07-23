@@ -3,19 +3,16 @@
  *
  * Coypright (c) 2017 Goodix
  */
+
 #ifndef __GF_SPI_H
 #define __GF_SPI_H
 
 #define CONFIG_MSM_RDM_NOTIFY
-#undef CONFIG_FB
-#if defined(CONFIG_MSM_RDM_NOTIFY)
 #include <drm/drm_panel.h>
-#endif
-
 #include <linux/types.h>
 #include <linux/notifier.h>
 /**********************************************************/
-enum FP_MODE{
+enum FP_MODE {
 	GF_IMAGE_MODE = 0,
 	GF_KEY_MODE,
 	GF_SLEEP_MODE,
@@ -28,19 +25,6 @@ struct fp_underscreen_info {
     uint16_t x;
     uint16_t y;
 };
-#define SUPPORT_NAV_EVENT
-
-#if defined(SUPPORT_NAV_EVENT)
-#define GF_NAV_INPUT_UP			KEY_UP
-#define GF_NAV_INPUT_DOWN		KEY_DOWN
-#define GF_NAV_INPUT_LEFT		KEY_LEFT
-#define GF_NAV_INPUT_RIGHT		KEY_RIGHT
-#define GF_NAV_INPUT_CLICK		KEY_VOLUMEDOWN
-#define GF_NAV_INPUT_DOUBLE_CLICK	KEY_VOLUMEUP
-#define GF_NAV_INPUT_LONG_PRESS BTN_B
-#define GF_NAV_INPUT_F2 KEY_F2
-#define GF_NAV_INPUT_HEAVY		KEY_CHAT
-#endif
 
 #define GF_KEY_INPUT_HOME		KEY_HOME
 #define GF_KEY_INPUT_MENU		KEY_MENU
@@ -49,23 +33,6 @@ struct fp_underscreen_info {
 #define GF_KEY_INPUT_CAMERA		KEY_CAMERA
 #define GF_KEY_INPUT_LONG_PRESS		BTN_B
 
-
-#if defined(SUPPORT_NAV_EVENT)
-typedef enum gf_nav_event {
-	GF_NAV_NONE = 0,
-	GF_NAV_FINGER_UP,
-	GF_NAV_FINGER_DOWN,
-	GF_NAV_UP,
-	GF_NAV_DOWN,
-	GF_NAV_LEFT,
-	GF_NAV_RIGHT,
-	GF_NAV_CLICK,
-	GF_NAV_HEAVY,
-	GF_NAV_LONG_PRESS,
-	GF_NAV_DOUBLE_CLICK,
-	GF_NAV_F2,
-} gf_nav_event_t;
-#endif
 
 typedef enum gf_key_event {
 	GF_KEY_NONE = 0,
@@ -117,10 +84,7 @@ struct gf_ioc_chip_info {
 #define  GF_IOC_MAXNR    14  /* THIS MACRO IS NOT USED NOW... */
 #endif
 
-//#define AP_CONTROL_CLK       1
 #define  USE_PLATFORM_BUS     1
-//#define  USE_SPI_BUS	1
-//#define GF_FASYNC   1	/*If support fasync mechanism.*/
 #define GF_NETLINK_ENABLE 1
 #define GF_NET_EVENT_IRQ 1
 #define GF_NET_EVENT_FB_BLACK 2
@@ -134,20 +98,16 @@ struct gf_ioc_chip_info {
 struct gf_dev {
 	dev_t devt;
 	struct list_head device_entry;
-#if defined(USE_SPI_BUS)
-	struct spi_device *spi;
-#elif defined(USE_PLATFORM_BUS)
 	struct platform_device *spi;
-#endif
 	struct clk *core_clk;
 	struct clk *iface_clk;
 
 	struct input_dev *input;
 	/* buffer is NULL unless this device is open (users > 0) */
-	unsigned users;
-	signed irq_gpio;
-	signed reset_gpio;
-	signed pwr_gpio;
+	unsigned int users;
+	signed int irq_gpio;
+	signed int reset_gpio;
+	signed int pwr_gpio;
 	int irq;
 	int irq_enabled;
 	int clk_enabled;
@@ -157,35 +117,28 @@ struct gf_dev {
 	int regulator_vdd_vmax;
 	int regulator_vdd_current;
 
-#ifdef GF_FASYNC
-	struct fasync_struct *async;
-#endif
-#if defined(CONFIG_FB)
-	struct notifier_block notifier;
-#elif defined(CONFIG_MSM_RDM_NOTIFY)
 	struct notifier_block msm_drm_notif;
-#endif
 	char device_available;
 	char fb_black;
 	struct pinctrl         *gf_pinctrl;
 	struct pinctrl_state   *gpio_state_enable;
 	struct pinctrl_state   *gpio_state_disable;
-	signed enable_gpio;
+	signed int enable_gpio;
 	int screen_state;
 };
-int gf_pinctrl_init(struct gf_dev* gf_dev);
-int gf_parse_dts(struct gf_dev* gf_dev);
-void gf_cleanup(struct gf_dev *gf_dev);
-int gf_power_on(struct gf_dev *gf_dev);
-int gf_power_off(struct gf_dev *gf_dev);
+static inline int gf_pinctrl_init(struct gf_dev *gf_dev);
+static inline int gf_parse_dts(struct gf_dev *gf_dev);
+static inline void gf_cleanup(struct gf_dev *gf_dev);
+static inline int gf_power_on(struct gf_dev *gf_dev);
+static inline int gf_power_off(struct gf_dev *gf_dev);
 
-int gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms);
-int gf_irq_num(struct gf_dev *gf_dev);
+static inline int gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms);
+static inline int gf_irq_num(struct gf_dev *gf_dev);
 
-void sendnlmsg(char *msg);
-void sendnlmsg_tp(struct fp_underscreen_info *msg, int length);
-int netlink_init(void);
-void netlink_exit(void);
+static inline void sendnlmsg(char *msg);
+static inline void sendnlmsg_tp(struct fp_underscreen_info *msg, int length);
+static inline int netlink_init(void);
+static inline void netlink_exit(void);
 extern int gf_opticalfp_irq_handler(int event);
-extern int opticalfp_irq_handler(struct fp_underscreen_info* tp_info);
+extern int opticalfp_irq_handler(struct fp_underscreen_info *tp_info);
 #endif /*__GF_SPI_H*/
