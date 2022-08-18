@@ -149,3 +149,6 @@ Android.bp
 
 # Output directory
 out/
+
+# NetHunter kernel builder
+kali-nethunter-kernel
